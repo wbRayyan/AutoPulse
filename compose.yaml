@@ -1,5 +1,20 @@
 name: autopulse
 
+# Shared settings for every container that runs the Laravel application
+x-php-base: &php-base
+  build:
+    context: ./docker/php
+  image: autopulse-php:dev
+  restart: unless-stopped
+  volumes:
+    - ./backend:/var/www/html
+    - backend-vendor:/var/www/html/vendor
+  depends_on:
+    postgres:
+      condition: service_healthy
+    redis:
+      condition: service_healthy
+
 services:
   postgres:
     image: postgres:17-alpine
@@ -18,17 +33,23 @@ services:
       timeout: 5s
       retries: 5
 
-  php:
-    build:
-      context: ./docker/php
-    image: autopulse-php:dev
+  redis:
+    image: redis:7-alpine
     restart: unless-stopped
     volumes:
-      - ./backend:/var/www/html
-      - backend-vendor:/var/www/html/vendor
-    depends_on:
-      postgres:
-        condition: service_healthy
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  php:
+    <<: *php-base
+
+  queue:
+    <<: *php-base
+    command: ["php", "artisan", "queue:work", "--tries=3", "--backoff=10", "--max-time=3600"]
 
   nginx:
     image: nginx:1.28-alpine
@@ -43,4 +64,5 @@ services:
 
 volumes:
   postgres-data:
+  redis-data:
   backend-vendor:
