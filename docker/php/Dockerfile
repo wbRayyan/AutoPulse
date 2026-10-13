@@ -15,4 +15,11 @@ RUN install-php-extensions \
     zip \
     opcache
 
+# Make Laravel's writable directories usable by PHP-FPM on every container start
+COPY entrypoint.sh /usr/local/bin/autopulse-entrypoint
+RUN chmod +x /usr/local/bin/autopulse-entrypoint
+
 WORKDIR /var/www/html
+
+ENTRYPOINT ["autopulse-entrypoint"]
+CMD ["php-fpm"]
