@@ -126,18 +126,22 @@ and license expiries daily.
 
 ---
 
-## ADR-009: Frontend Server State with TanStack Query
+## ADR-009: Frontend Stack and Server State
 
 **Context:** Most frontend state is data fetched from the API (vehicles, alerts, schedules).
+The project is built by a single developer on a fixed timeline.
 
-**Decision:** Use TanStack Query for server state, a shared Axios instance for HTTP,
-and React Hook Form with Zod for forms. Code is organized by feature, not by file type.
+**Decision:** Use React with Vite in plain JavaScript (no TypeScript), linted with ESLint
+including the React Hooks rules. Use TanStack Query for server state, a shared Axios instance
+for HTTP, and React Hook Form with Zod for forms. Code is organized by feature, not by file type.
 
 **Consequences:**
 - (+) Built-in caching, background refetching, loading and error states.
 - (+) No global store needed for API data.
+- (+) Less syntax overhead, so effort stays on features and API integration.
+- (−) No compile-time type checking; mismatched API response shapes surface only at runtime.
+  Mitigated by ESLint, Zod schemas at form and API boundaries, and backend feature tests.
 - (−) Additional library to learn compared to plain `useEffect` fetching.
-
 ---
 
 ## ADR-010: Engineering Workflow
