@@ -62,7 +62,19 @@ services:
     depends_on:
       - php
 
+  frontend:
+    image: node:22-alpine
+    restart: unless-stopped
+    working_dir: /app
+    command: ["sh", "-c", "npm install && npm run dev"]
+    ports:
+      - "${VITE_PORT:-5173}:5173"
+    volumes:
+      - ./frontend:/app
+      - frontend-node-modules:/app/node_modules
+
 volumes:
   postgres-data:
   redis-data:
   backend-vendor:
+  frontend-node-modules:
