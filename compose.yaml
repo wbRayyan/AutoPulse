@@ -27,8 +27,11 @@ services:
       - "${FORWARD_DB_PORT:-5433}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
+      # SQL scripts here run once, when the data volume is empty
+      - ./docker/postgres/init:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      # TCP check: only the real server listens on TCP, not the temporary init server
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
       retries: 5
