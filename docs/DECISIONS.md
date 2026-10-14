@@ -55,10 +55,15 @@ Telematics devices also need machine-to-machine authentication.
 
 **Decision:** Use Sanctum personal access tokens (Bearer tokens) for users.
 Devices authenticate with a separate per-vehicle token stored only as a SHA-256 hash.
+Registration creates an organization together with its owner in one database transaction.
+Every login issues a new token, and logout revokes only the token used for that request.
 
 **Consequences:**
 - (+) Stateless, client-agnostic authentication that works for web, mobile and devices.
-- (+) Tokens can be individually revoked on logout.
+- (+) Tokens can be individually revoked on logout, so signing out on one device keeps other devices signed in.
+- (+) Login attempts are rate limited per email and IP address (5 per minute), and unknown emails and
+  wrong passwords return the same generic error, preventing brute force and user enumeration.
+- (+) API routes never redirect guests and always render errors as JSON, even without an `Accept` header.
 - (−) Tokens stored in browser storage are exposed to XSS attacks. Sanctum's cookie-based
   SPA authentication avoids this for same-domain SPAs. Mitigations: token expiration,
   revocation on logout, and strict input sanitization.
@@ -69,14 +74,26 @@ Devices authenticate with a separate per-vehicle token stored only as a SHA-256 
 
 **Context:** Multiple organizations share the platform and must never see each other's data.
 
-**Decision:** Store all tenants in one database. Top-level tables carry an `organization_id`
-column, filtered automatically by an Eloquent global scope.
+**Decision:** Store all tenants in one database. Top-level tables carry an `organization_id` column.
+- Tenant-owned models use the `BelongsToOrganization` trait, which adds the `OrganizationScope`
+  global scope and assigns `organization_id` automatically when a record is created.
+- The current tenant is held in a `CurrentOrganization` service, registered as a `scoped` binding.
+- The `tenant` middleware sets it from the authenticated user and always runs after `auth:sanctum`.
+  Queued jobs and Artisan commands set it explicitly with `runAs()`.
+- The scope fails closed: without a current organization, queries match nothing and creating
+  a tenant-owned record throws an exception.
 
 **Consequences:**
 - (+) Simple migrations, backups and deployment; one connection pool.
 - (+) Standard approach for early-stage SaaS products.
-- (−) A missed scope or raw query can leak data across tenants. Mitigated by
-  global scopes, Policies and dedicated tenant-isolation tests.
+- (+) A missing tenant shows up as empty results or an exception, never as another tenant's data.
+- (+) The `scoped` binding resets the tenant between requests and queued jobs, so long-running
+  queue workers cannot carry one organization's context into the next job.
+- (−) Global scopes apply only to Eloquent queries; `DB::table()` and raw SQL bypass them.
+  Mitigated by keeping raw queries out of tenant code and by dedicated tenant-isolation tests,
+  including fetching another tenant's record by id.
+- (−) Cross-tenant system jobs must remove the scope explicitly with
+  `withoutGlobalScope(OrganizationScope::class)`, which keeps such queries visible in code review.
 
 ---
 
@@ -142,6 +159,7 @@ for HTTP, and React Hook Form with Zod for forms. Code is organized by feature, 
 - (−) No compile-time type checking; mismatched API response shapes surface only at runtime.
   Mitigated by ESLint, Zod schemas at form and API boundaries, and backend feature tests.
 - (−) Additional library to learn compared to plain `useEffect` fetching.
+
 ---
 
 ## ADR-010: Engineering Workflow
@@ -157,3 +175,23 @@ for HTTP, and React Hook Form with Zod for forms. Code is organized by feature, 
 - (+) Readable history and reviewable changes.
 - (+) Broken code cannot silently reach `main`.
 - (−) Slightly slower workflow for a solo developer, accepted for long-term quality.
+
+---
+
+## ADR-011: Automated Tests on a Dedicated PostgreSQL Database
+
+**Context:** The schema relies on PostgreSQL-specific behavior such as partial unique indexes,
+`timestamptz` and foreign key rules. SQLite in memory behaves differently, so tests could pass
+while production fails.
+
+**Decision:** Pest feature tests run against a separate `autopulse_test` database, created by a
+PostgreSQL init script on the container's first start. `phpunit.xml` forces `DB_CONNECTION=pgsql`
+and `DB_DATABASE=autopulse_test`, and feature tests use `RefreshDatabase`.
+
+**Consequences:**
+- (+) Tests run on the same database engine as production.
+- (+) `force="true"` prevents an environment variable from ever pointing tests at a real database.
+- (+) Each test runs in a rolled-back transaction; PostgreSQL also rolls back schema changes,
+  so tests can create temporary fixture tables safely.
+- (−) Tests need a running PostgreSQL container; CI must provide one as a service.
+- (−) Slower than SQLite in memory, accepted for correctness.
