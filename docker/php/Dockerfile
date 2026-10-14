@@ -14,7 +14,9 @@ RUN install-php-extensions \
     pcntl \
     zip \
     opcache
-
+    
+# Running as root is expected inside this container; silence Composer's warning
+ENV COMPOSER_ALLOW_SUPERUSER=1
 # Make Laravel's writable directories usable by PHP-FPM on every container start
 COPY entrypoint.sh /usr/local/bin/autopulse-entrypoint
 RUN chmod +x /usr/local/bin/autopulse-entrypoint
