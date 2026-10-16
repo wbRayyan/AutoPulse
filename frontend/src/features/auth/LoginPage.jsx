@@ -4,10 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useLocation, useNavigate } from 'react-router'
 import { LoaderCircle, TriangleAlert } from 'lucide-react'
 import { z } from 'zod'
-import PasswordInput from '../../components/PasswordInput'
+import TextField from '../../components/TextField'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { applyValidationErrors, getErrorMessage } from '../../lib/apiErrors'
-import { inputClassName } from '../../lib/formStyles'
 import { useLogin } from './useLogin'
 
 const loginSchema = z.object({
@@ -62,46 +61,25 @@ export default function LoginPage() {
       )}
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-        <div className="space-y-2">
-          <label htmlFor="email" className="block text-sm font-medium">
-            Email
-          </label>
-          <input
-            id="email"
-            type="email"
-            autoComplete="email"
-            placeholder="you@company.com"
-            aria-invalid={errors.email ? 'true' : 'false'}
-            aria-describedby={errors.email ? 'email-error' : undefined}
-            className={inputClassName(Boolean(errors.email))}
-            {...register('email')}
-          />
-          {errors.email && (
-            <p id="email-error" className="text-sm text-danger">
-              {errors.email.message}
-            </p>
-          )}
-        </div>
+        <TextField
+          id="email"
+          label="Email"
+          type="email"
+          autoComplete="email"
+          placeholder="you@company.com"
+          error={errors.email?.message}
+          {...register('email')}
+        />
 
-        <div className="space-y-2">
-          <label htmlFor="password" className="block text-sm font-medium">
-            Password
-          </label>
-          <PasswordInput
-            id="password"
-            autoComplete="current-password"
-            placeholder="Your password"
-            hasError={Boolean(errors.password)}
-            aria-invalid={errors.password ? 'true' : 'false'}
-            aria-describedby={errors.password ? 'password-error' : undefined}
-            {...register('password')}
-          />
-          {errors.password && (
-            <p id="password-error" className="text-sm text-danger">
-              {errors.password.message}
-            </p>
-          )}
-        </div>
+        <TextField
+          id="password"
+          label="Password"
+          isPassword
+          autoComplete="current-password"
+          placeholder="Your password"
+          error={errors.password?.message}
+          {...register('password')}
+        />
 
         <button
           type="submit"
