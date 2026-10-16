@@ -1,6 +1,8 @@
 import { createBrowserRouter } from 'react-router'
 import PlaceholderPage from '../components/PlaceholderPage'
+import AuthLayout from '../features/auth/AuthLayout'
 import GuestOnly from '../features/auth/GuestOnly'
+import LoginPage from '../features/auth/LoginPage'
 import RequireAuth from '../features/auth/RequireAuth'
 import AppLayout from './AppLayout'
 import NotFoundPage from './NotFoundPage'
@@ -10,20 +12,17 @@ export const router = createBrowserRouter([
     element: <GuestOnly />,
     children: [
       {
-        path: '/login',
-        element: (
-          <main className="flex min-h-screen items-center justify-center p-6">
-            <PlaceholderPage title="Sign in" description="The sign-in form arrives in Step 3.10." isBrandPage />
-          </main>
-        ),
-      },
-      {
-        path: '/register',
-        element: (
-          <main className="flex min-h-screen items-center justify-center p-6">
-            <PlaceholderPage title="Create account" description="Organization registration arrives in Step 3.10." />
-          </main>
-        ),
+        element: <AuthLayout />,
+        children: [
+          {
+            path: '/login',
+            element: <LoginPage />,
+          },
+          {
+            path: '/register',
+            element: <PlaceholderPage title="Create account" description="Organization registration arrives in Step 3.10b." />,
+          },
+        ],
       },
     ],
   },
