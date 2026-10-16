@@ -1,11 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content="AutoPulse is a fleet telematics and maintenance platform." />
-    <title>AutoPulse</title>
+    <title>AutoPulse | Fleet Telematics</title>
+    <script>
+      // Apply the saved theme before the first paint to avoid a flash of the wrong theme.
+      ;(function () {
+        var stored = null
+        try {
+          stored = window.localStorage.getItem('autopulse-theme')
+        } catch (error) {
+          stored = null
+        }
+        var theme = stored === 'light' || stored === 'dark' || stored === 'system' ? stored : 'dark'
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+        var isDark = theme === 'dark' || (theme === 'system' && prefersDark)
+        document.documentElement.classList.toggle('dark', isDark)
+      })()
+    </script>
   </head>
   <body>
     <div id="root"></div>

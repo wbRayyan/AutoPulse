@@ -1,1 +1,121 @@
 @import "tailwindcss";
+@import "@fontsource-variable/space-grotesk";
+@import "@fontsource-variable/jetbrains-mono";
+
+/* Dark mode follows the "dark" class on <html>, set by the theme script in index.html */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+}
+
+/* Light theme values */
+:root {
+  --ap-canvas: #fafafa;
+  --ap-surface: #ffffff;
+  --ap-raised: #f4f4f5;
+  --ap-line: #e4e4e7;
+  --ap-line-strong: #d4d4d8;
+  --ap-fg: #18181b;
+  --ap-fg-muted: #52525b;
+  --ap-fg-subtle: #71717a;
+  --ap-accent: #0e7490;
+  --ap-accent-hover: #155e75;
+  --ap-accent-fg: #ffffff;
+  --ap-accent-soft: rgb(8 145 178 / 0.1);
+  --ap-success: #047857;
+  --ap-success-soft: #ecfdf5;
+  --ap-success-line: #a7f3d0;
+  --ap-warning: #b45309;
+  --ap-warning-soft: #fffbeb;
+  --ap-warning-line: #fde68a;
+  --ap-danger: #be123c;
+  --ap-danger-soft: #fff1f2;
+  --ap-danger-line: #fecdd3;
+  --ap-info: #3f3f46;
+  --ap-info-soft: #f4f4f5;
+  --ap-info-line: #d4d4d8;
+}
+
+/* Dark theme values (Cockpit HUD) */
+.dark {
+  --ap-canvas: #09090b;
+  --ap-surface: #111114;
+  --ap-raised: #18181b;
+  --ap-line: #27272a;
+  --ap-line-strong: #3f3f46;
+  --ap-fg: #fafafa;
+  --ap-fg-muted: #a1a1aa;
+  --ap-fg-subtle: #71717a;
+  --ap-accent: #22d3ee;
+  --ap-accent-hover: #67e8f9;
+  --ap-accent-fg: #061a1f;
+  --ap-accent-soft: rgb(34 211 238 / 0.1);
+  --ap-success: #6ee7b7;
+  --ap-success-soft: rgb(16 185 129 / 0.12);
+  --ap-success-line: rgb(16 185 129 / 0.35);
+  --ap-warning: #fcd34d;
+  --ap-warning-soft: rgb(245 158 11 / 0.12);
+  --ap-warning-line: rgb(245 158 11 / 0.35);
+  --ap-danger: #fda4af;
+  --ap-danger-soft: rgb(244 63 94 / 0.14);
+  --ap-danger-line: rgb(244 63 94 / 0.4);
+  --ap-info: #cbd5e1;
+  --ap-info-soft: rgb(148 163 184 / 0.12);
+  --ap-info-line: rgb(148 163 184 / 0.3);
+}
+
+/* Semantic color utilities: bg-surface, text-fg-muted, border-line, bg-accent, ... */
+@theme inline {
+  --color-canvas: var(--ap-canvas);
+  --color-surface: var(--ap-surface);
+  --color-raised: var(--ap-raised);
+  --color-line: var(--ap-line);
+  --color-line-strong: var(--ap-line-strong);
+  --color-fg: var(--ap-fg);
+  --color-fg-muted: var(--ap-fg-muted);
+  --color-fg-subtle: var(--ap-fg-subtle);
+  --color-accent: var(--ap-accent);
+  --color-accent-hover: var(--ap-accent-hover);
+  --color-accent-fg: var(--ap-accent-fg);
+  --color-accent-soft: var(--ap-accent-soft);
+  --color-success: var(--ap-success);
+  --color-success-soft: var(--ap-success-soft);
+  --color-success-line: var(--ap-success-line);
+  --color-warning: var(--ap-warning);
+  --color-warning-soft: var(--ap-warning-soft);
+  --color-warning-line: var(--ap-warning-line);
+  --color-danger: var(--ap-danger);
+  --color-danger-soft: var(--ap-danger-soft);
+  --color-danger-line: var(--ap-danger-line);
+  --color-info: var(--ap-info);
+  --color-info-soft: var(--ap-info-soft);
+  --color-info-line: var(--ap-info-line);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  html.dark {
+    color-scheme: dark;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-fg antialiased;
+  }
+}
+
+/* Respect users who ask their operating system for less motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
