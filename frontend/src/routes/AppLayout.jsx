@@ -1,4 +1,5 @@
 import { NavLink, Outlet } from 'react-router'
+import { useMe } from '../features/auth/useMe'
 
 const links = [
   { to: '/', label: 'Dashboard', end: true },
@@ -10,9 +11,11 @@ const links = [
 ]
 
 export default function AppLayout() {
+  const { data: user } = useMe()
+
   return (
     <div className="min-h-screen">
-      <nav aria-label="Main navigation" className="flex flex-wrap gap-2 border-b border-line bg-surface px-4 py-3">
+      <nav aria-label="Main navigation" className="flex flex-wrap items-center gap-2 border-b border-line bg-surface px-4 py-3">
         {links.map((link) => (
           <NavLink
             key={link.to}
@@ -27,6 +30,9 @@ export default function AppLayout() {
             {link.label}
           </NavLink>
         ))}
+        <p className="ml-auto text-sm text-fg-muted">
+          {user.name} · <span className="font-mono uppercase">{user.role}</span> · {user.organization?.name}
+        </p>
       </nav>
       <main className="p-4 sm:p-6">
         <Outlet />
