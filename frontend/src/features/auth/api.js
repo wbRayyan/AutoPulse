@@ -13,3 +13,9 @@ export async function login(credentials) {
 
   return response.data.data
 }
+
+export async function registerOrganization(payload) {
+  const response = await api.post('/auth/register', payload)
+
+  return response.data.data
+}

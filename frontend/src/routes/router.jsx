@@ -3,6 +3,7 @@ import PlaceholderPage from '../components/PlaceholderPage'
 import AuthLayout from '../features/auth/AuthLayout'
 import GuestOnly from '../features/auth/GuestOnly'
 import LoginPage from '../features/auth/LoginPage'
+import RegisterPage from '../features/auth/RegisterPage'
 import RequireAuth from '../features/auth/RequireAuth'
 import AppLayout from './AppLayout'
 import NotFoundPage from './NotFoundPage'
@@ -20,7 +21,7 @@ export const router = createBrowserRouter([
           },
           {
             path: '/register',
-            element: <PlaceholderPage title="Create account" description="Organization registration arrives in Step 3.10b." />,
+            element: <RegisterPage />,
           },
         ],
       },
