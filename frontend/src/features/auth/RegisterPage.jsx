@@ -2,9 +2,10 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useNavigate } from 'react-router'
-import { LoaderCircle, TriangleAlert } from 'lucide-react'
+import { LoaderCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { z } from 'zod'
+import FormErrorBanner from '../../components/FormErrorBanner'
 import TextField from '../../components/TextField'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { applyValidationErrors, getErrorMessage } from '../../lib/apiErrors'
@@ -84,12 +85,7 @@ export default function RegisterPage() {
         <p className="text-fg-muted">Set up AutoPulse for your fleet. You will be the owner.</p>
       </div>
 
-      {formError && (
-        <div role="alert" className="flex gap-3 rounded-md border border-warning-line bg-warning-soft p-4 text-sm">
-          <TriangleAlert aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-warning" />
-          <p>{formError}</p>
-        </div>
-      )}
+      {formError && <FormErrorBanner message={formError} />}
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <TextField

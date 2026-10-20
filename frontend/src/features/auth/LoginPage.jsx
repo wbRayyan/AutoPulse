@@ -2,8 +2,9 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Link, useLocation, useNavigate } from 'react-router'
-import { LoaderCircle, TriangleAlert } from 'lucide-react'
+import { LoaderCircle } from 'lucide-react'
 import { z } from 'zod'
+import FormErrorBanner from '../../components/FormErrorBanner'
 import TextField from '../../components/TextField'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
 import { applyValidationErrors, getErrorMessage } from '../../lib/apiErrors'
@@ -53,12 +54,7 @@ export default function LoginPage() {
         <p className="text-fg-muted">Sign in to manage your fleet.</p>
       </div>
 
-      {formError && (
-        <div role="alert" className="flex gap-3 rounded-md border border-warning-line bg-warning-soft p-4 text-sm">
-          <TriangleAlert aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-warning" />
-          <p>{formError}</p>
-        </div>
-      )}
+      {formError && <FormErrorBanner message={formError} />}
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <TextField
