@@ -26,3 +26,10 @@ it('does not grant access to other origins', function () {
         ->not->toBe('*')
         ->not->toBe('https://evil.example');
 });
+
+it('exposes the Retry-After header so the frontend can show a countdown', function () {
+    $this->withHeaders(['Origin' => 'http://localhost:5173'])
+        ->getJson('/api/v1/auth/me')
+        ->assertUnauthorized()
+        ->assertHeader('Access-Control-Expose-Headers', 'Retry-After');
+});

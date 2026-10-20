@@ -11,6 +11,9 @@ return [
     | The API authenticates with Bearer tokens instead of cookies, so
     | credentials support stays disabled and no CSRF cookie route is exposed.
     |
+    | Retry-After is exposed so the frontend can show an exact countdown
+    | when a request is rate limited (HTTP 429).
+    |
     */
 
     'paths' => ['api/*'],
@@ -23,7 +26,7 @@ return [
 
     'allowed_headers' => ['*'],
 
-    'exposed_headers' => [],
+    'exposed_headers' => ['Retry-After'],
 
     'max_age' => 0,
 
