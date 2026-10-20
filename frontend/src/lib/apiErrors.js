@@ -21,6 +21,10 @@ export function getErrorMessage(error) {
   }
 
   if (!error.response) {
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      return 'You appear to be offline. Check your internet connection and try again.'
+    }
+
     return 'Unable to reach AutoPulse. Check your connection and try again.'
   }
 
