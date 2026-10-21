@@ -30,3 +30,17 @@ export function getErrorMessage(error) {
 
   return 'Something went wrong. Please try again.'
 }
+
+// Seconds until a rate-limited request may be retried, from the Retry-After header.
+// Returns null when the error is not a 429 or the header is missing or not a number.
+export function getRetryAfterSeconds(error) {
+  if (error.response?.status !== 429) {
+    return null
+  }
+
+  const headers = error.response.headers
+  const value = headers?.get?.('retry-after') ?? headers?.['retry-after']
+  const seconds = Number.parseInt(value, 10)
+
+  return Number.isFinite(seconds) && seconds > 0 ? seconds : null
+}

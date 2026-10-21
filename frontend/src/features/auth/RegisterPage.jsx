@@ -8,7 +8,7 @@ import { z } from 'zod'
 import FormErrorBanner from '../../components/FormErrorBanner'
 import TextField from '../../components/TextField'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
-import { applyValidationErrors, getErrorMessage } from '../../lib/apiErrors'
+import { applyValidationErrors, getErrorMessage, getRetryAfterSeconds } from '../../lib/apiErrors'
 import { useRegister } from './useRegister'
 
 const fieldsSchema = z.object({
@@ -71,7 +71,10 @@ export default function RegisterPage() {
       },
       onError: (error) => {
         if (!applyValidationErrors(error, setError)) {
-          setFormError(getErrorMessage(error))
+          setFormError({
+            message: getErrorMessage(error),
+            retryAfterSeconds: getRetryAfterSeconds(error),
+          })
         }
       },
     })
@@ -85,7 +88,9 @@ export default function RegisterPage() {
         <p className="text-fg-muted">Set up AutoPulse for your fleet. You will be the owner.</p>
       </div>
 
-      {formError && <FormErrorBanner message={formError} />}
+      {formError && (
+        <FormErrorBanner message={formError.message} retryAfterSeconds={formError.retryAfterSeconds} />
+      )}
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <TextField

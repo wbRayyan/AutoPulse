@@ -7,7 +7,7 @@ import { z } from 'zod'
 import FormErrorBanner from '../../components/FormErrorBanner'
 import TextField from '../../components/TextField'
 import { useDocumentTitle } from '../../hooks/useDocumentTitle'
-import { applyValidationErrors, getErrorMessage } from '../../lib/apiErrors'
+import { applyValidationErrors, getErrorMessage, getRetryAfterSeconds } from '../../lib/apiErrors'
 import { useLogin } from './useLogin'
 
 const loginSchema = z.object({
@@ -40,7 +40,10 @@ export default function LoginPage() {
       onSuccess: () => navigate(location.state?.from?.pathname ?? '/', { replace: true }),
       onError: (error) => {
         if (!applyValidationErrors(error, setError)) {
-          setFormError(getErrorMessage(error))
+          setFormError({
+            message: getErrorMessage(error),
+            retryAfterSeconds: getRetryAfterSeconds(error),
+          })
         }
       },
     })
@@ -54,7 +57,9 @@ export default function LoginPage() {
         <p className="text-fg-muted">Sign in to manage your fleet.</p>
       </div>
 
-      {formError && <FormErrorBanner message={formError} />}
+      {formError && (
+        <FormErrorBanner message={formError.message} retryAfterSeconds={formError.retryAfterSeconds} />
+      )}
 
       <form noValidate onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <TextField
